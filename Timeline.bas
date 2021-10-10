@@ -1,21 +1,20 @@
-Attribute VB_Name = "Module1"
 Option Explicit
-Sub Timeline()
-    '------All variables------'
-    Dim ppPres As PowerPoint.Presentation
-    Dim ppApp As PowerPoint.Application
-    Dim ppSlide As PowerPoint.Slide
-    Dim slidesCount As Long
-    Dim tableShape As Shape
-    Dim slideWidth As Single
-    Dim slideHeight As Single
-    Dim activeSlide As Single
-    Dim x As Long
-    Dim past As Long
-    Dim present As Long
-    Dim future As Long
-    Dim borders As Long
-    
+'------All variables------'
+Public ppPres As PowerPoint.Presentation
+Public ppApp As PowerPoint.Application
+Public ppSlide As PowerPoint.Slide
+Public slidesCount As Long
+Public tableShape As Shape
+Public slideWidth As Single
+Public slideHeight As Single
+Public activeSlide As Single
+Public x, i As Long
+Public past As Long
+Public present As Long
+Public future As Long
+Public borders As Long
+
+Sub SetupTimeline()
     '------Theme colors------'
     'Adjust these to match your power point theme
     past = RGB(165, 255, 250)
@@ -55,14 +54,30 @@ Sub Timeline()
     'If ppApp.ActiveWindow.Selection.Type = ppSelectionSlides Then
         'Set ppSlide = ppApp.ActiveWindow.Selection.SlideRange(1)
         '' or Set ppSlide = ppApp.ActiveWindow.View.Slide
+        'Call CreateTimeline(ppSlide)
     'End If
     'Debug.Print ppSlide.SlideID, ppSlide.SlideNumber, ppSlide.SlideIndex
     
     '------For each slide in presentation------'
     For Each ppSlide In ppPres.Slides
+        Call CreateTimeline(ppSlide)
+    Next ppSlide
+End Sub
+
+Sub CreateTimeline(ppSlide As PowerPoint.Slide)
+        'Delete if already a Timeline table exists
+        With ppSlide.Shapes
+            For i = 1 To .Count
+                If .Item(i).HasTable And .Item(i).Name = "Timeline" Then
+                    .Item(i).Delete
+                End If
+            Next
+        End With
         'Create table with 1 row columns = number of slides on the bottom of the slide
         'https://docs.microsoft.com/en-us/office/vba/api/powerpoint.shapes.addtable
         Set tableShape = ppPres.Slides(ppSlide.SlideIndex).Shapes.AddTable(1, slidesCount, 0, slideHeight - 6, slideWidth, 20)
+        'Give a name for the table so when deleting other tables will not be deleted
+        tableShape.Name = "Timeline"
         '------Set styles for all borders/ cells------'
         With tableShape.Table
             For x = 1 To .Columns.Count
@@ -101,16 +116,4 @@ Sub Timeline()
                 End If
             End With
         End If
-    Next ppSlide
 End Sub
-
-'-------------------------References-------------------------'
-'https://stackoverflow.com/questions/24929913/powerpoint-vba-loop-all-slides-all-shapes-find-chart-set-datalabel-color-to
-'https://stackoverflow.com/questions/34497087/how-to-change-table-header-color-in-ppt-vba
-'https://stackoverflow.com/questions/55378289/formatting-powerpoint-table-using-vba-very-slow
-'https://stackoverflow.com/questions/8999796/how-to-get-power-point-slide-dimension-using-vba
-'https://docs.microsoft.com/en-us/office/vba/api/powerpoint.shapes.addtable
-'https://www.tek-tips.com/viewthread.cfm?qid=1606256
-'https://stackoverflow.com/questions/57117613/getting-the-active-slide-of-a-ppt-presentation-via-vba-but-from-excel
-'https://stackoverflow.com/questions/45391119/powerpoint-slide-count-variable-in-vba
-'https://stackoverflow.com/questions/67504136/slide-count-variable-in-vba-powerpoint

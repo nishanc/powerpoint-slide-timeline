@@ -5,7 +5,6 @@ This VBA script generates a timeline indicator/ progress bar on the botton of ea
 ![Screenshot](/Screenshot.png)
 
 ## How to use  :wrench:
----
 
 Step 1: Open PowerPoint
 
